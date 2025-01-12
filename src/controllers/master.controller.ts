@@ -9,7 +9,7 @@ export class MasterController {
     session.startTransaction();
   
     try {
-      const { CompanyName, Address, Phone, GSTIN, Email } = req.body;
+      const { CompanyName,Username, Address, Phone, GSTIN, Email,Password } = req.body;
   
       // Check if a company with the same GSTIN already exists
       const existingCompany = await Company.findOne({ GSTIN }).session(session);
@@ -26,9 +26,9 @@ export class MasterController {
   
       // Create a user for the company
       const user = new User({
-        Name: CompanyName,
+        Name: Username,
         Email,
-        Password: 'defaultpassword123',
+        Password: Password,
         CID: company.CID,
       });
   
