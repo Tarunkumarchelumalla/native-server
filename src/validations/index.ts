@@ -1,0 +1,1 @@
+export * as userValidations from './user.validation'

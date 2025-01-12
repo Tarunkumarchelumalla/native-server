@@ -1,0 +1,391 @@
+[
+    {
+        "id": "68f1848e179aa3a8",
+        "type": "tab",
+        "label": "Email Connector",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "e85ecc589bd9ac77",
+        "type": "http response",
+        "z": "68f1848e179aa3a8",
+        "name": "Started",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1540,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "398e8d1ffb7dcc99",
+        "type": "function",
+        "z": "68f1848e179aa3a8",
+        "name": "Variables",
+        "func": "const token = \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVSUQiOiI2NmI3YjhkODJlMDMyZTU4Y2FmZWEzOTEiLCJlbWFpbCI6InRlc3RAbGlnaHR3b3Jrcy1zZXJ2aWNlcy5jb20iLCJpYXQiOjE3Mjk0NDM5ODksImV4cCI6MTcyOTUzMDM4OX0.i2LPG5l83K-vC-VpTYq2NRKy5IDZUo6ZsPaYptkQ8ew\";\nconst host = \"https://billdesk-email-apis.lightworks-services.com/api\";\nconst auth = \"Bearer \" + token;\nflow.set(\"host\", host);\nflow.set(\"token\", auth);\nmsg.host = host;\nmsg.auth = auth;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 280,
+        "wires": [
+            [
+                "1125ad1a5b3ab781"
+            ]
+        ]
+    },
+    {
+        "id": "1125ad1a5b3ab781",
+        "type": "http request",
+        "z": "68f1848e179aa3a8",
+        "name": "GET CURRENT BATCHES",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "{{{host}}}/masters/batch/get-current-batches",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "Authorization",
+                "keyValue": "",
+                "valueType": "msg",
+                "valueValue": "auth"
+            }
+        ],
+        "x": 880,
+        "y": 280,
+        "wires": [
+            [
+                "656227b4569524b6",
+                "44f775ad46fb0c5c",
+                "890809b595cce9e7"
+            ]
+        ]
+    },
+    {
+        "id": "656227b4569524b6",
+        "type": "switch",
+        "z": "68f1848e179aa3a8",
+        "name": "BATCH EXISTS",
+        "property": "payload.data",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nempty"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1180,
+        "y": 300,
+        "wires": [
+            [
+                "e85ecc589bd9ac77",
+                "04ea25a4d86dcfdd"
+            ]
+        ]
+    },
+    {
+        "id": "04ea25a4d86dcfdd",
+        "type": "function",
+        "z": "68f1848e179aa3a8",
+        "name": "BATCH IDS",
+        "func": "const batches = msg.payload.data;\nconst batchNo = [];\nfor(let i=0; i< batches.length ; i++) {\n    batchNo.push(batches[i]._id);\n}\nmsg.payload.batches = batchNo;\nmsg.batches = batchNo;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1190,
+        "y": 380,
+        "wires": [
+            [
+                "c946702a754d53b0",
+                "0fc865ba1e3c05c4"
+            ]
+        ]
+    },
+    {
+        "id": "c946702a754d53b0",
+        "type": "debug",
+        "z": "68f1848e179aa3a8",
+        "name": "BATCHES LOG",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1480,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "0fc865ba1e3c05c4",
+        "type": "array-loop",
+        "z": "68f1848e179aa3a8",
+        "name": "Loop",
+        "key": "al0fc865ba1e3c05c4",
+        "keyType": "msg",
+        "reset": false,
+        "resetValue": "value-null",
+        "array": "batches",
+        "arrayType": "msg",
+        "x": 1550,
+        "y": 680,
+        "wires": [
+            [
+                "941aa0a9d7330c74"
+            ],
+            [
+                "59b8bd91ebdd86af",
+                "99d29e6ea0cc60a5"
+            ]
+        ]
+    },
+    {
+        "id": "941aa0a9d7330c74",
+        "type": "debug",
+        "z": "68f1848e179aa3a8",
+        "name": "EXIT",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1870,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "59b8bd91ebdd86af",
+        "type": "debug",
+        "z": "68f1848e179aa3a8",
+        "name": "EACH BATCH",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1880,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "66730ba7b141b68d",
+        "type": "http request",
+        "z": "68f1848e179aa3a8",
+        "name": "",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "{{{host}}}/masters/batch/start-batch/{{{CURRENT_BATCH_ID}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [
+            {
+                "keyType": "Authorization",
+                "keyValue": "",
+                "valueType": "msg",
+                "valueValue": "auth"
+            }
+        ],
+        "x": 2070,
+        "y": 680,
+        "wires": [
+            [
+                "22a201d47266a401",
+                "5af7156e51344144"
+            ]
+        ]
+    },
+    {
+        "id": "99d29e6ea0cc60a5",
+        "type": "change",
+        "z": "68f1848e179aa3a8",
+        "name": "CURRENT BATCH",
+        "rules": [
+            {
+                "t": "set",
+                "p": "CURRENT_BATCH_ID",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1850,
+        "y": 680,
+        "wires": [
+            [
+                "66730ba7b141b68d"
+            ]
+        ]
+    },
+    {
+        "id": "22a201d47266a401",
+        "type": "debug",
+        "z": "68f1848e179aa3a8",
+        "name": "START BATCH RESPONSE",
+        "active": true,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 2370,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "5af7156e51344144",
+        "type": "function",
+        "z": "68f1848e179aa3a8",
+        "name": "NEXT ITERATION",
+        "func": "\n    //msg.batches.shift();\n    msg.payload.batches = msg.batches;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1810,
+        "y": 800,
+        "wires": [
+            [
+                "0fc865ba1e3c05c4"
+            ]
+        ]
+    },
+    {
+        "id": "474f1d2178f81d8f",
+        "type": "cronplus",
+        "z": "68f1848e179aa3a8",
+        "name": "EVERY 20 Seconds",
+        "outputField": "payload",
+        "timeZone": "",
+        "storeName": "",
+        "commandResponseMsgOutput": "output1",
+        "defaultLocation": "",
+        "defaultLocationType": "default",
+        "outputs": 1,
+        "options": [
+            {
+                "name": "schedule1",
+                "topic": "topic1",
+                "payloadType": "default",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "*/20 * * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 320,
+        "y": 280,
+        "wires": [
+            [
+                "398e8d1ffb7dcc99"
+            ]
+        ]
+    },
+    {
+        "id": "44f775ad46fb0c5c",
+        "type": "debug",
+        "z": "68f1848e179aa3a8",
+        "name": "CURRENT BATCHES",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1160,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "890809b595cce9e7",
+        "type": "switch",
+        "z": "68f1848e179aa3a8",
+        "name": "BATCH EMPTY",
+        "property": "payload.data",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "empty"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1180,
+        "y": 240,
+        "wires": [
+            [
+                "624fae026564440b"
+            ]
+        ]
+    },
+    {
+        "id": "624fae026564440b",
+        "type": "http response",
+        "z": "68f1848e179aa3a8",
+        "name": "No Batch to Process",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1500,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "ebcf34e7c833fa6c",
+        "type": "http in",
+        "z": "68f1848e179aa3a8",
+        "name": "Manual End Point",
+        "url": "email/batch/manual",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 310,
+        "y": 200,
+        "wires": [
+            [
+                "398e8d1ffb7dcc99"
+            ]
+        ]
+    }
+]
